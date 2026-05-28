@@ -12,7 +12,7 @@
     <meta content="https://we-are-jammin.xyz/jammin.png" name="twitter:image" property="og:image">
     <meta content="summary" name="twitter:card">
 
-    <!-- Plausible analytics -->
+    <!-- Plausible analytics (optional) -->
     <script defer data-domain="we-are-jammin.xyz" src="https://a.erisly.moe/js/script.js"></script>
     <script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
 
@@ -101,15 +101,17 @@
                 pushMeme('GPU Info', gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL));
             }
 
-            // --- Video loading via CORS proxy ---
+            // --- Video loading from local file (same origin) ---
+            // IMPORTANT: Place your jammin.mp4 file in the same folder as this HTML file.
+            // Then serve the folder with a static HTTP server (e.g., `python -m http.server 8000`).
+            // The fetch will work because it's same-origin (no CORS).
             let response;
             try {
-                // Use the proxy endpoint provided by your Node server
-                response = await fetch('/proxy-video');
-                if (!response.ok) throw new Error(`Proxy returned ${response.status}`);
+                response = await fetch('/jammin.mp4');
+                if (!response.ok) throw new Error(`Failed to load video: ${response.status}`);
             } catch (err) {
                 console.error(err);
-                setLoadingMessage('Proxy error: make sure the Node server is running (node server.js)');
+                setLoadingMessage('Error: Could not load jammin.mp4. Make sure the file exists and you are using a web server (not file://)');
                 loadingProgress.textContent = 'Error';
                 return;
             }
@@ -128,7 +130,7 @@
                     const percent = Math.floor((receivedLength / parseInt(contentLength)) * 95);
                     loadingProgress.textContent = Math.min(95, percent);
                 } else {
-                    // fallback if no Content-Length
+                    // fallback if no Content-Length (unlikely for local file)
                     loadingProgress.textContent = '50';
                 }
             }

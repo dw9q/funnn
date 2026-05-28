@@ -101,15 +101,15 @@
                 pushMeme('GPU Info', gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL));
             }
 
-            // --- Video loading via CORS proxy ---
+            // --- Video loading from local file (same origin) ---
+            // FIX: Use relative path (no leading slash) for GitHub Pages subfolder
             let response;
             try {
-                // Use the proxy endpoint provided by your Node server
-                response = await fetch('/proxy-video');
-                if (!response.ok) throw new Error(`Proxy returned ${response.status}`);
+                response = await fetch('jammin.mp4');
+                if (!response.ok) throw new Error(`Failed to load video: ${response.status}`);
             } catch (err) {
                 console.error(err);
-                setLoadingMessage('Proxy error: make sure the Node server is running (node server.js)');
+                setLoadingMessage('Error: Could not load jammin.mp4. Make sure the file exists in the same folder as this HTML file.');
                 loadingProgress.textContent = 'Error';
                 return;
             }
@@ -128,7 +128,6 @@
                     const percent = Math.floor((receivedLength / parseInt(contentLength)) * 95);
                     loadingProgress.textContent = Math.min(95, percent);
                 } else {
-                    // fallback if no Content-Length
                     loadingProgress.textContent = '50';
                 }
             }
